@@ -5,7 +5,7 @@
 <div id="scheduleBox" class="box"><div id="sbInner"><canvas id="schedule"></div></div>
 
 <div id="geninfo" class="box">
-	<textarea placeholder="enter class codes (e.g. 10038) separated by whitespace; shift+enter to generate schedule"id="classesToAdd"></textarea>
+	<textarea placeholder="enter class codes (e.g. 10038) separated by whitespace; ctrl+s to save/generate schedule"id="classesToAdd"></textarea>
 	<textarea placeholder="some output will appear here" id="output"></textarea>
 </div>
 
@@ -46,7 +46,7 @@ function load()
 }
 
 CLASS_INPUT.addEventListener('keydown', e => {
-	if (!(e.shiftKey && e.key === 'Enter')) return
+	if (!(e.ctrlKey && e.key === 's')) return
 	
 	save(CLASS_INPUT.value)
 	gen()
