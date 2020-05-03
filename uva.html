@@ -5,11 +5,7 @@
 <div id="scheduleBox" class="box"><div id="sbInner"><canvas id="schedule"></div></div>
 
 <div id="geninfo" class="box">
-	<textarea placeholder="enter class codes (e.g. 10038) separated by newlines"id="classesToAdd"></textarea>
-	<table>
-		<tr><td></td><td><input type="button" value="add classes" onclick="addClasses();" /></td></tr>
-		<tr><td><input class="class" id="10038" type="checkbox" onchange="gen();"></input></td><td>10038 elementary arabic ofzo</td></tr>
-	</table>
+	<textarea placeholder="enter class codes (e.g. 10038) separated by whitespace; shift+enter to generate schedule"id="classesToAdd"></textarea>
 	<textarea placeholder="some output will appear here" id="output"></textarea>
 </div>
 
@@ -29,21 +25,39 @@ body {
 
 #geninfo { width:400px }
 textarea { width: 100%; height: 12em; resize: none }
-#geninfo table { margin: auto }
-#geninfo td { padding: 0.2em }
-#geninfo td:first-child { text-align: right }
 </style>
 
 <script>
+const KEY = 'uva_schedule'
 const CLASS_INPUT = document.querySelector("#classesToAdd")
 const SCHEDULE_DISPLAY = new ScheduleCanvas("schedule", {background: "#fff"});
 
-SCHEDULE_DISPLAY.drawSchedule("");
+/// saves past work in local storage
+function save(work)
+{
+	window.localStorage.setItem(KEY, JSON.stringify(work))
+}
+
+/// gets past work in local storage
+function load()
+{
+	let loaded = JSON.parse(window.localStorage.getItem(KEY))
+	return loaded? loaded : ''
+}
+
+CLASS_INPUT.addEventListener('keydown', e => {
+	if (!(e.shiftKey && e.key === 'Enter')) return
+	
+	save(CLASS_INPUT.value)
+	gen()
+	
+	e.preventDefault()
+})
 
 const url = new URL(window.location.href);
 const srcurl = url.searchParams.get("src");
 
-// sets ui values from text
+// loads schedule data from 1. URL or 2. local storage
 if (srcurl) {
 	fetch(srcurl)
 		.then(resp => resp.text())
@@ -51,35 +65,21 @@ if (srcurl) {
 			CLASS_INPUT.value = text
 			addClasses()
 		})
+} else {
+	CLASS_INPUT.value = load()
 }
 
-function addClasses()
-{
-	for (let c of CLASS_INPUT.value.split('\n'))
-		if (c)
-			addClass(c, true)
-	
-	CLASS_INPUT.value = ''
-}
+SCHEDULE_DISPLAY.drawSchedule("");
 
-function addClass(c, checked)
-{
-	promiseClass(c, cls => {
-		const classSelect = document.createElement('tr')
-		
-		classSelect.innerHTML = `<td><input class="class" id="${c}" type="checkbox" onchange="gen();"${checked? ' checked':''}></input></td><td>${cls[0].title}</td>`
-		
-		document.querySelector("#geninfo table").appendChild(classSelect)
-		
-		gen();
-	});
+String.prototype.scanz = function(regex) {
+	return Array.from(this.matchAll(regex)).map(groups => groups[0])
 }
 
 function gen()
-{
-	const classes = Array.from(document.querySelectorAll('.class'))
-		.filter(elem => elem.checked)
-		.map(elem => elem.id);
+{	
+	const classes = CLASS_INPUT.value
+		.replace(/#.+/g, '') // remove comments
+		.scanz(/\d+/g)       // extract codes
 	
 	promiseSchedule(classes, sched => {
 		SCHEDULE_DISPLAY.drawScheduleCallback(sched)
