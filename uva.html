@@ -40,7 +40,7 @@ const SCHEDULE_DISPLAY = new ScheduleCanvas('schedule', {background: '#fff'});
 function load()
 {
 	const loaded = window.localStorage.getItem(KEY)
-	return loaded? loaded : '# enter class codes like this:\n12345 23456\n34567\n\n# use #s for comments'
+	return loaded? loaded : '# enter class codes separated by whitespace\n# use #s for comments\n# press ctrl+s to save/draw schedule\n\n12345 # some class\n23456 # some other class\n\n# other classes:\n34567 45678 56789'
 }
 
 /// editor keylistener (saves work in local storage)
