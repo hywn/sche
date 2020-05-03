@@ -21,42 +21,26 @@ function promiseSchedule(classCodes, pfunc)
 function promiseClass(classCode, pfunc)
 {
 	scurl("https://louslist.org/sectiontip.php?ClassNumber=" + classCode, text => {
-		const p = new Parser(text)
-		const title = p.du('class="InfoClass">').du('class="InfoClass">').deleteUntil('<br')
-		
-		const tals = getTALs(p.du('class="InfoMeetings"'))
-			.map(tal => ({
+		const title = text.match(/(class="InfoClass">)(.*)(<br)/)[2]
+		const tals = Array.from(text.matchAll(/(?<=\/td><td>)(.*?)(?:<\/td><td>)(.*?)(?=<\/td><\/tr>)/g)).map(groups => {
+			
+			let timedow  = groups[1].toLowerCase()
+			let location = groups[2]
+			
+			let times = timedow.match(/\d+:\d+(?:am|pm)/g)
+			
+			return {
 				title: title,
-				loc: tal.loc,
-				dows: tal.dows,
-				start: tal.start,
-				end: tal.end
-			}))
+				loc:   location,
+				dows:  timedow.match(/mo|tu|we|th|fr|sa|su/g).map(name => days.indexOf(name)),
+				start: toHRT(times[0]),
+				end:   toHRT(times[1])
+			}
+			
+		})
 		
 		pfunc(tals)
 	})
-}
-
-/* takes a Parser object that points to a louslist course page right after the first 'class="InfoMeetings"'
- * returns a list of TALs that represents that course
-*/
-function getTALs(p, times=[])
-{	
-	const timeStuff = p.du('</td><td>').deleteUntil("</td><td>").split(' ') // 'MoWeFr 9:00AM - 9:50AM' split by spaces
-
-	times.push({
-		loc: p.deleteUntil("</td>"),
-		dows: timeStuff[0].toLowerCase().split(/(?=(?:..)*$)/).map(textdow => days.indexOf(textdow)), // 'MoWeFr' -> 'mo', 'we', 'fr'
-		start: toHRT(timeStuff[1]),
-		end: toHRT(timeStuff[3])
-	})
-	
-	if (p.continueUntil('</table>').includes('<strong>')) {
-		p.clear(true)
-		return getTALs(p, times)
-	}
-	
-	return times;
 }
 
 /* takes a 12-hour time string
@@ -80,51 +64,4 @@ function scurl(url, cfunc)
 	fetch('https://simplecorsworkaround.herokuapp.com/?url=' + encodeURIComponent(url))
 		.then(resp => resp.text())
 		.then(text => cfunc(text))
-}
-
-class Parser
-{
-	constructor(text, bindex, bsize)
-	{
-		this.text = text
-		this.bindex = 0
-		this.bsize = 0
-	}
-	
-	getBuffer(offset=0)
-	{
-		return this.text.substring(this.bindex, this.bindex + this.bsize + offset)
-	}
-	
-	reset()
-	{
-		this.bindex = this.bsize = 0
-	}
-	
-	clear(keepBuffer=false)
-	{
-		if(!keepBuffer) this.bindex += this.bsize
-		this.bsize = 0
-	}
-	
-	continueUntil(token, keepToken=false)
-	{
-		while(!this.getBuffer().endsWith(token)) {
-			if(this.bindex + this.bsize == this.text.length) return null
-			this.bsize++
-		}
-		return this.getBuffer(keepToken? 0 : -token.length)
-	}
-	
-	deleteUntil(token)
-	{
-		let buffer = this.continueUntil(token)
-		this.clear()
-		return buffer
-	}
-	
-	du (token){
-		this.deleteUntil(token)
-		return this
-	}
 }
