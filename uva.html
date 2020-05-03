@@ -75,11 +75,10 @@ if (srcurl) {
 		.then(resp => resp.text())
 		.then(text => {
 			EDITOR.value = text
-			addClasses()
+			gen()
 		})
 } else {
 	EDITOR.value = load()
+	gen()
 }
-
-gen()
 </script>
