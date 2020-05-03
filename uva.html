@@ -34,7 +34,7 @@ const EDITOR = document.querySelector('#editor')
 const OUTPUT = document.querySelector('#output')
 
 const KEY = 'uva_schedule'
-const SCHEDULE_DISPLAY = new ScheduleCanvas('schedule', {background: '#fff'});
+const SCHEDULE_DISPLAY = new ScheduleCanvas('schedule', {background: '#fff'})
 
 /// gets past work in local storage
 function load()
@@ -65,7 +65,7 @@ function gen()
 	promiseSchedule(classes, sched => {
 		SCHEDULE_DISPLAY.drawScheduleCallback(sched)
 		OUTPUT.value = getTextSchedule(sched)
-	});
+	})
 }
 
 // loads schedule data from 1. URL or 2. local storage
