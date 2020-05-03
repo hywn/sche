@@ -77,9 +77,9 @@ function toHRT(text)
 */
 function scurl(url, cfunc)
 {
-	fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(url))
-		.then(resp => resp.json())
-		.then(json => cfunc(json.contents))
+	fetch('http://cs.virginia.edu/~jh7qbe/test.php?url=' + encodeURIComponent(url))
+		.then(resp => resp.text())
+		.then(text => cfunc(text))
 }
 
 class Parser
