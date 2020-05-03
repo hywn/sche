@@ -3,6 +3,11 @@
 
 function promiseSchedule(classCodes, pfunc)
 {
+	if (!classCodes) {
+		pfunc('')
+		return
+	}
+	
 	const schedule = []
 	const goal = classCodes.length
 	let curr = 0
@@ -13,7 +18,7 @@ function promiseSchedule(classCodes, pfunc)
 		promiseClass(classCode, classes => {
 			schedule.push(...classes)
 			if (++curr == goal)
-				pfunc(schedule)
+				pfunc(schedule.filter(c => c != null))
 		})
 	}
 }
@@ -28,6 +33,9 @@ function promiseClass(classCode, pfunc)
 			let location = groups[2]
 			
 			let times = timedow.match(/\d+:\d+(?:am|pm)/g)
+			
+			if (!times)
+				return null
 			
 			return {
 				title: title,
