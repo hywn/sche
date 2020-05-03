@@ -5,8 +5,8 @@
 <div id="scheduleBox" class="box"><div id="sbInner"><canvas id="schedule"></div></div>
 
 <div id="geninfo" class="box">
-	<textarea placeholder="enter class codes (e.g. 10038) separated by whitespace; ctrl+s to save/generate schedule"id="classesToAdd"></textarea>
-	<textarea placeholder="some output will appear here" id="output"></textarea>
+	<textarea id="editor" placeholder="editor window"></textarea>
+	<textarea id="output" placeholder="output window"></textarea>
 </div>
 
 <style>
@@ -24,67 +24,65 @@ body {
 #scheduleBox { display: inline-block }
 
 #geninfo { width:400px }
-textarea { width: 100%; height: 12em; resize: none }
+textarea { width: 100%; resize: none }
+#editor { height: 24em }
+#output { height: 12em }
 </style>
 
 <script>
-const KEY = 'uva_schedule'
-const CLASS_INPUT = document.querySelector("#classesToAdd")
-const SCHEDULE_DISPLAY = new ScheduleCanvas("schedule", {background: "#fff"});
+const EDITOR = document.querySelector('#editor')
+const OUTPUT = document.querySelector('#output')
 
-/// saves past work in local storage
-function save(work)
-{
-	window.localStorage.setItem(KEY, JSON.stringify(work))
-}
+const KEY = 'uva_schedule'
+const SCHEDULE_DISPLAY = new ScheduleCanvas('schedule', {background: '#fff'});
 
 /// gets past work in local storage
 function load()
 {
-	let loaded = JSON.parse(window.localStorage.getItem(KEY))
-	return loaded? loaded : ''
+	const loaded = window.localStorage.getItem(KEY)
+	return loaded? loaded : '# enter class codes like this:\n12345 23456\n34567\n\n# use #s for comments'
 }
 
-CLASS_INPUT.addEventListener('keydown', e => {
+/// editor keylistener (saves work in local storage)
+EDITOR.addEventListener('keydown', e => {
 	if (!(e.ctrlKey && e.key === 's')) return
 	
-	save(CLASS_INPUT.value)
+	window.localStorage.setItem(KEY, EDITOR.value)
 	gen()
 	
 	e.preventDefault()
 })
 
-const url = new URL(window.location.href);
-const srcurl = url.searchParams.get("src");
-
-// loads schedule data from 1. URL or 2. local storage
-if (srcurl) {
-	fetch(srcurl)
-		.then(resp => resp.text())
-		.then(text => {
-			CLASS_INPUT.value = text
-			addClasses()
-		})
-} else {
-	CLASS_INPUT.value = load()
-}
-
 String.prototype.scanz = function(regex) {
 	return Array.from(this.matchAll(regex)).map(groups => groups[0])
 }
 
+/// displays canvas schedule; outputs output
 function gen()
 {	
-	const classes = CLASS_INPUT.value
+	const classes = EDITOR.value
 		.replace(/#.+/g, '') // remove comments
 		.scanz(/\d+/g)       // extract codes
 	
-	document.querySelector('#output').value = 'loading...'
+	OUTPUT.value = 'loading...'
 	
 	promiseSchedule(classes, sched => {
 		SCHEDULE_DISPLAY.drawScheduleCallback(sched)
-		document.querySelector('#output').value = getTextSchedule(sched)
+		OUTPUT.value = getTextSchedule(sched)
 	});
+}
+
+// loads schedule data from 1. URL or 2. local storage
+const srcurl = new URL(window.location.href).searchParams.get("src")
+if (srcurl) {
+	fetch(srcurl)
+		.then(resp => resp.text())
+		.then(text => {
+			EDITOR.value = text
+			addClasses()
+		})
+} else {
+	EDITOR.value = load()
 }
 
 gen()
