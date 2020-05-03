@@ -69,8 +69,6 @@ if (srcurl) {
 	CLASS_INPUT.value = load()
 }
 
-SCHEDULE_DISPLAY.drawSchedule("");
-
 String.prototype.scanz = function(regex) {
 	return Array.from(this.matchAll(regex)).map(groups => groups[0])
 }
@@ -87,4 +85,5 @@ function gen()
 	});
 }
 
+gen()
 </script>
