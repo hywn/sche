@@ -79,6 +79,8 @@ function gen()
 		.replace(/#.+/g, '') // remove comments
 		.scanz(/\d+/g)       // extract codes
 	
+	document.querySelector('#output').value = 'loading...'
+	
 	promiseSchedule(classes, sched => {
 		SCHEDULE_DISPLAY.drawScheduleCallback(sched)
 		document.querySelector('#output').value = getTextSchedule(sched)
