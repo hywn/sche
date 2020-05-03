@@ -77,7 +77,7 @@ function toHRT(text)
 */
 function scurl(url, cfunc)
 {
-	fetch('http://cs.virginia.edu/~jh7qbe/test.php?url=' + encodeURIComponent(url))
+	fetch('https://simplecorsworkaround.herokuapp.com/?url=' + encodeURIComponent(url))
 		.then(resp => resp.text())
 		.then(text => cfunc(text))
 }
