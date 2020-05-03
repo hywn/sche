@@ -66,7 +66,7 @@ function getTALs(p, times=[])
 */
 function toHRT(text)
 {
-	const nums = text.match(/[0-9]+/g).map(n => Number(n))
+	const nums = text.match(/\d+/g).map(n => Number(n))
 	const ampm = text.toLowerCase().match(/am|pm/g)[0] === 'pm' ? 12 : 0
 	
 	return (ampm + nums[0] % 12) + nums[1] / 60

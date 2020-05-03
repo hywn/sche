@@ -53,16 +53,12 @@ EDITOR.addEventListener('keydown', e => {
 	e.preventDefault()
 })
 
-String.prototype.scanz = function(regex) {
-	return Array.from(this.matchAll(regex)).map(groups => groups[0])
-}
-
 /// displays canvas schedule; outputs output
 function gen()
 {	
 	const classes = EDITOR.value
 		.replace(/#.+/g, '') // remove comments
-		.scanz(/\d+/g)       // extract codes
+		.match(/\d+/g)       // extract codes
 	
 	OUTPUT.value = 'loading...'
 	
