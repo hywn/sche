@@ -30,11 +30,10 @@ const days = ['su', 'mo', 'tu', 'we', 'th', 'fr', 'sa']
  */
 function parseSchedule(text)
 {
-	let items = []
-	for (let chunk of text.split('\n\n'))
-		if (chunk)
-			items = items.concat(parseChunk(chunk))
-	return items
+	return text.split('\n\n')
+		.filter(chunk => chunk)
+		.flatMap(chunk => parseChunk(chunk))
+		.filter(parsed => parsed)
 }
 
 /** takes text separated by single newlines
@@ -47,31 +46,39 @@ function parseSchedule(text)
  ** and returns its representative items
  */
 function parseChunk(chunkText)
-{
-	let items = []
-	let lines = chunkText.split('\n')
-	let dows = lines[0].toLowerCase().split(/(?=(?:..)*$)/).map(dow => days.indexOf(dow))
-	for (let line of lines.slice(1, lines.length)) {
-		let spaces = line.split(' ')
-		let atIndex = line.indexOf(' at ')
-		items.push({
-			title: line.substring(12, (atIndex == -1)? line.length : atIndex),
-			loc: (atIndex == -1)? 'idk lmao' : line.substring(atIndex + 4),
-			start: parseHours(line, 0, 5),
-			end: parseHours(line, 6, 5),
-			dows: dows
-		})
-		//console.log(items)
-	}
+{	
+	const lines = chunkText.split('\n')
+
+	// temporary fix?
+	if (!lines[0].match(/(mo|we|fr|tu|th|sa|su)+/gi))
+		return null
 	
-	return items
+	const dows = lines[0].toLowerCase()
+		.match(/mo|we|fr|tu|th|sa|su/g)
+		.map(dow => days.indexOf(dow))
+	
+	return lines.slice(1).map(line => {
+		
+		const groups = line.match(/(.+?)-(.+?)\s+(.+?)(?= at (.+)|$)/i)
+		
+		return {
+			start: parseHours(groups[1]),
+			end:   parseHours(groups[2]),
+			title: groups[3],
+			loc:   groups[4]? groups[4] : 'unknown',
+			dows:  dows
+		}
+	})
 }
 
-function parseHours(string, start, end)
+function parseHours(string)
 {
-	parts = string.substr(start, end).split(':')
+	const groups = string.toLowerCase().match(/(\d{1,2}):?(\d{0,2})?(am|pm)?/)
+	const hours  = parseFloat(groups[1])
+	const mins   = groups[2]? parseFloat(groups[2]) : 0
+	const ampm   = groups[3]
 	
-	return parseInt(parts[0]) + parseInt(parts[1])/60
+	return mins/60 + (ampm? hours % 12 : hours) + (ampm? (ampm === 'pm'? 12 : 0) : 0)
 }
 
 function getTextSchedule(schedule)
