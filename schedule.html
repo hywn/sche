@@ -92,7 +92,7 @@ function gen()
 	document.querySelector("#sbInner").style.backgroundColor = s.background
 	
 	// note: temporary workaround?
-	s.drawSchedule(EDITOR.value.replace(/#.*/g, '').trim())
+	s.drawSchedule(EDITOR.value.replace(/#.*/g, '').replace(/^!.+/mg, '').trim())
 }
 
 /// editor keylistener (saves work in local storage)
