@@ -57,7 +57,7 @@ EDITOR.addEventListener('keydown', e => {
 function gen()
 {	
 	const classes = EDITOR.value
-		.replace(/#.+/g, '') // remove comments
+		.replace(/#.*/g, '') // remove comments
 		.match(/\d+/g)       // extract codes
 	
 	OUTPUT.value = 'loading...'
