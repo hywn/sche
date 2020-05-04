@@ -22,7 +22,7 @@ class ScheduleCanvas
 {
 	constructor(canvasID, new_settings=default_settings)
 	{
-		let settings = default_settings
+		let settings = {...default_settings}
 		
 		for (let [k, v] of Object.entries(new_settings)) // there is probably a cleaner way to do this
 			Reflect.set(settings, k, v)

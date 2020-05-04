@@ -1,23 +1,14 @@
-<html>
-
 <script src="schedule.js"></script>
 <script src="canvasschedule.js"></script>
 
-<div id="scheduleBox" class="box"><div id="sbInner"><canvas id="scheduleCanvas"></div></div>
+<div id="scheduleBox" class="box">
+	<div id="sbInner">
+		<canvas id="scheduleCanvas">
+	</div>
+</div>
 
 <div id="geninfo" class="box">
-		<textarea id="data"></textarea>
-		<table>
-			<tr>
-				<td></td>
-				<td><input type="button" value="generate" onclick="gen();" /></td>
-			</tr>
-			<tbody id="fields"></tbody>
-			<tr>
-				<td><input type="button" value="import settings, generate" onclick="importSettings();" /></td>
-				<td><input type="button" value="append/replace settings" onclick="appendSettings();" /></td>
-			</tr>
-		</table>
+	<textarea id="editor"></textarea>
 </div>
 
 <style>
@@ -32,81 +23,107 @@ body { display: flex;
 #scheduleBox { display: inline-block }
 
 #geninfo { width:400px }
-#data { width: 100%; height: 25em }
-#geninfo table { margin: auto }
-#geninfo td { padding: 0.2em }
-#geninfo td:first-child { text-align: right }
+#editor { width: 100%; height: 36em; white-space: nowrap }
 </style>
 
 <script>
-let data = document.querySelector("#data");
+const EDITOR = document.querySelector('#editor')
+const KEY    = 'regular_schedule'
+const TUTORIAL = `# enter your schedule in the following format:
+#
+# day(s) of the week
+# time-time some event
+# time-time some other event
+#
+# some examples:
 
-let srcurl = new URL(window.location.href).searchParams.get("src");
+mo we fr
+08:15-09:30 eat breakfast
+12:30-13:40 eat lunch
 
-if (srcurl) // sets ui values from text
+tuth
+8:30 - 9:45   eat special breakfast
+12pm - 2:50pm eat lunch
+
+fr
+0950 - 1030 brunch
+
+# use #s for comments
+# use !s to set settings like so:
+
+!background #fof
+!font 14px Comic Sans MS
+
+# you only need to set those you wish to override.
+# generate a list of all settings with !default:
+
+!default
+
+# press ctrl+s to save/generate your schedule
+# delete everything and reload the page to see this tutorial text again`
+
+/// gets default settings nicely padded
+function get_default_settings_text()
 {
-	fetch(srcurl).then((response) => response.text()).then(text => {
-		data.value = text
-		importSettings()
-	})
+	const spacing = Math.max(...Object.keys(default_settings).map(key => key.length))
+	return Object.entries(default_settings)
+		.map(entry => `!${(entry[0]).padEnd(spacing)} ${entry[1]}`)
+		.join('\n')
 }
 
-// generate settings panel
-for (const [k, v] of Object.entries(default_settings)) {
-	
-	const field = document.createElement('tr')
-	
-	field.innerHTML = `<td>${k}</td><td><input id="${k}" type="text" value="${v}" /></td>`
-	
-	document.querySelector('#fields').appendChild(field)
-	
-}
-
-gen()
-
+/// generates schedule
 function gen()
 {
-	let settings = {...default_settings}
-	for (let [k, v] of Object.entries(settings)) {
-		if (typeof v === 'number') Reflect.set(settings, k, getNumber(k))
-		else Reflect.set(settings, k, getString(k))
-	}
+	EDITOR.value = EDITOR.value.replace(/^!default$/mg, get_default_settings_text())
+
+	const settings = {...default_settings}
 	
-	//settings.shortDays = settings.shortDays.split(",")
-	//settings.longDays = settings.longDays.split(",")
+	Array.from(EDITOR.value.matchAll(/!(\w+)\s+(.+)/g))
+		.filter(groups => groups[1] in settings)
+		.forEach(groups => {
+			settings[groups[1]] =
+				typeof settings[groups[1]] === 'number'?
+					Number(groups[2])
+					: groups[2]
+		})
 	
 	s = new ScheduleCanvas('scheduleCanvas', settings)
 	
 	document.querySelector("#sbInner").style.backgroundColor = s.background
-	s.drawSchedule(data.value)
+	
+	// note: temporary workaround?
+	s.drawSchedule(EDITOR.value.replace(/#.*/g, '').trim())
 }
 
-function importSettings()
-     { for (element of document.getElementById("geninfo").querySelectorAll("input[type=text]"))
-              if ((settingValue = getSetting(element.id)) != null)
-                     element.value = settingValue
-       gen() }
+/// editor keylistener (saves work in local storage)
+EDITOR.addEventListener('keydown', e => {
+	if (!(e.ctrlKey && e.key === 's')) return
+	
+	window.localStorage.setItem(KEY, EDITOR.value)
+	gen()
+	
+	e.preventDefault()
+})
 
-function appendSettings()
-     {	let index
-       if ((index = data.value.lastIndexOf("\n\nsettings:")) != -1)
-              data.value = data.value.substring(0, index)
-       data.value += "\n\nsettings:"
-       for (element of document.getElementById("geninfo").querySelectorAll("input[type=text]"))
-              document.getElementById("data").value += "\n" + element.id + "=" + element.value }
+/// gets past work in local storage
+function load()
+{
+	const loaded = window.localStorage.getItem(KEY)
+	return loaded? loaded : TUTORIAL
 
-function getLine(start)
-     { for (line of data.value.split("\n"))
-              if (line.startsWith(start)) return line
-       return null }
+}
 
-function getSetting(id)
-     {	if ((line = getLine(id + "=")) != null)
-              return line.split("=")[1]
-       return null }
-
-function getNumber(id) { return Number(getString(id)) }
-function getString(id) { return document.getElementById(id).value }
+// loads schedule data from 1. URL or 2. local storage
+const srcurl = new URL(window.location.href).searchParams.get("src")
+if (srcurl) {
+	fetch(srcurl)
+		.then(resp => resp.text())
+		.then(text => {
+			EDITOR.value = text
+			gen()
+		})
+} else {
+	EDITOR.value = load()
+	gen()
+}
 </script>
-
-</html>
