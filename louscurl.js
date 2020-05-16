@@ -4,24 +4,13 @@
 function promiseSchedule(classCodes)
 {
 	return new Promise(resolve => {
-		if (!classCodes) {
+		if (!classCodes || classCodes.length == 0) {
 			resolve('')
 			return
 		}
 
-		const schedule = []
-		const goal = classCodes.length
-		let curr = 0
-
-		if (goal == 0) { resolve(''); return }
-
-		for (let classCode of classCodes) {
-			promiseClass(classCode).then(classes => {
-				schedule.push(...classes)
-				if (++curr == goal)
-					resolve(schedule.filter(c => c != null))
-			})
-		}
+		Promise.all(classCodes.map(code => promiseClass(code)))
+			.then(talss => resolve(talss.flat().filter(tal => tal)))
 	})
 }
 
