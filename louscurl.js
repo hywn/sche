@@ -22,7 +22,7 @@ function promiseSchedule(classCodes)
 /* takes a UVA class code (e.g. 12345)
  *
  * returns an array of objects that, as described in schedule.js,
- * represent a meeting time of the given class
+ * represent the meeting times of the given class
 */
 function promiseClass(classCode)
 {
