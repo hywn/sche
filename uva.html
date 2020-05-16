@@ -19,7 +19,7 @@ body {
 }
 
 .box { background-color: #eee; padding: 1em; margin: 1em }
-	
+
 #sbInner { background-color: #fff; padding: 1em }
 #scheduleBox { display: inline-block }
 
@@ -46,23 +46,23 @@ function load()
 /// editor keylistener (saves work in local storage)
 EDITOR.addEventListener('keydown', e => {
 	if (!(e.ctrlKey && e.key === 's')) return
-	
+
 	window.localStorage.setItem(KEY, EDITOR.value)
 	gen()
-	
+
 	e.preventDefault()
 })
 
 /// displays canvas schedule; outputs output
 function gen()
-{	
+{
 	const classes = EDITOR.value
 		.replace(/#.*/g, '') // remove comments
 		.match(/\d+/g)       // extract codes
-	
+
 	OUTPUT.value = 'loading...'
-	
-	promiseSchedule(classes, sched => {
+
+	promiseSchedule(classes).then(sched => {
 		SCHEDULE_DISPLAY.drawScheduleCallback(sched)
 		OUTPUT.value = getTextSchedule(sched)
 	})
