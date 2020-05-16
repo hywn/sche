@@ -1,6 +1,11 @@
 /// note: uses the following from schedule.js
 /// const days = ['su', 'mo', 'tu', 'we', 'th', 'fr', 'sa']
 
+/* takes an array of UVA class codes
+ *
+ * returns an array of objects that, as described in schedule.js,
+ * represent all meeting times of the given classes
+*/
 function promiseSchedule(classCodes)
 {
 	return new Promise(resolve => {
@@ -14,7 +19,12 @@ function promiseSchedule(classCodes)
 	})
 }
 
-function promiseClass(classCode, pfunc)
+/* takes a UVA class code (e.g. 12345)
+ *
+ * returns an array of objects that, as described in schedule.js,
+ * represent a meeting time of the given class
+*/
+function promiseClass(classCode)
 {
 	return new Promise(resolve =>
 		scurl("https://louslist.org/sectiontip.php?ClassNumber=" + classCode).then(text => {
