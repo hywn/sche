@@ -77,7 +77,7 @@ function gen()
 	EDITOR.value = EDITOR.value.replace(/^!default$/mg, get_default_settings_text())
 
 	const settings = {...default_settings}
-	
+
 	Array.from(EDITOR.value.matchAll(/!(\w+)\s+(.+)/g))
 		.filter(groups => groups[1] in settings)
 		.forEach(groups => {
@@ -86,11 +86,11 @@ function gen()
 					Number(groups[2])
 					: groups[2]
 		})
-	
+
 	s = new ScheduleCanvas('scheduleCanvas', settings)
-	
+
 	document.querySelector("#sbInner").style.backgroundColor = s.background
-	
+
 	// note: temporary workaround?
 	s.drawSchedule(EDITOR.value.replace(/#.*/g, '').replace(/^!.+/mg, '').trim())
 }
@@ -98,10 +98,10 @@ function gen()
 /// editor keylistener (saves work in local storage)
 EDITOR.addEventListener('keydown', e => {
 	if (!(e.ctrlKey && e.key === 's')) return
-	
+
 	window.localStorage.setItem(KEY, EDITOR.value)
 	gen()
-	
+
 	e.preventDefault()
 })
 
@@ -110,7 +110,6 @@ function load()
 {
 	const loaded = window.localStorage.getItem(KEY)
 	return loaded? loaded : TUTORIAL
-
 }
 
 // loads schedule data from 1. URL or 2. local storage

@@ -23,22 +23,22 @@ class ScheduleCanvas
 	constructor(canvasID, new_settings=default_settings)
 	{
 		let settings = {...default_settings}
-		
+
 		for (let [k, v] of Object.entries(new_settings)) // there is probably a cleaner way to do this
 			Reflect.set(settings, k, v)
-		
+
 		settings.longDays = settings.longDays.split(',')
 		settings.shortDays = settings.shortDays.split(',')
-		
+
 		for (let [k, v] of Object.entries(settings))
 			Reflect.set(this, k, v)
 
 		this.canvas = document.getElementById(canvasID)
 		this.c = this.canvas.getContext('2d')
-		
+
 		let can = this.canvas;
 		let c = this.c;
-		
+
 		can.width = this.marginX + this.padding*2 + this.longDays.length*this.blockWidth
 		can.height = this.marginY + this.padding*2 + (this.endHour - this.startHour + 1) * this.blockHeight
 

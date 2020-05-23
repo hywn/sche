@@ -46,21 +46,21 @@ function parseSchedule(text)
  ** and returns its representative items
  */
 function parseChunk(chunkText)
-{	
+{
 	const lines = chunkText.split('\n')
 
 	// temporary fix?
 	if (!lines[0].match(/(mo|we|fr|tu|th|sa|su)+/gi))
 		return null
-	
+
 	const dows = lines[0].toLowerCase()
 		.match(/mo|we|fr|tu|th|sa|su/g)
 		.map(dow => days.indexOf(dow))
-	
+
 	return lines.slice(1).map(line => {
-		
+
 		const groups = line.match(/(.+?)-(.+?)\s+(.+?)(?= at (.+)|$)/i)
-		
+
 		return {
 			start: parseHours(groups[1]),
 			end:   parseHours(groups[2]),
@@ -77,7 +77,7 @@ function parseHours(string)
 	const hours  = parseFloat(groups[1])
 	const mins   = groups[2]? parseFloat(groups[2]) : 0
 	const ampm   = groups[3]
-	
+
 	return mins/60 + (ampm? hours % 12 : hours) + (ampm? (ampm === 'pm'? 12 : 0) : 0)
 }
 
