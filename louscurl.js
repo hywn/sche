@@ -61,8 +61,8 @@ function toHRT(text)
 	return (ampm + hours % 12) + mins / 60
 }
 
-/* takes a url and a function
- * runs the function with the url's response text
+/* takes a url
+ * returns the text GET response of the url
 */
 async function scurl(url)
 {
