@@ -21,7 +21,7 @@ const cINPROGRESS = 'f5364f'
 
 let today_items = []
 
-function createClock(schedule)
+function create_clock(schedule)
 {
 	const curr_dow = new Date().getDay()
 
@@ -36,10 +36,13 @@ function createClock(schedule)
 function update()
 {
 	const today = new Date()
+	const numbers = [hours, mins, secs] = [today.getHours(), today.getMinutes(), today.getSeconds()]
 
-	TIME.innerHTML = `${pad(today.getHours())}:${pad(today.getMinutes())}:${pad(today.getSeconds())}`
+	TIME.innerHTML = numbers
+		.map(num => num.toString().padStart(2, '0'))
+		.join(':')
 
-	let now = today.getHours() + today.getMinutes()/60 + today.getSeconds()/60/60; // hrt
+	const now = hours + mins / 60 + secs / 60 / 60; // hrt
 
 	const curr_item = today_items
 		.find(i => i.start <= now && now < i.end)
@@ -51,24 +54,27 @@ function update()
 		.reverse()
 		.find(i => i.end < now)
 
-	let msg = '';
+	let msg = ''
 
-	if (curr_item != null) {
+	if (curr_item) {
 		msg = `you get out in ${Math.round(60 * (curr_item.end - now))} minutes`
-		set_gradient (now, curr_item.start, curr_item.end, cINPROGRESS, cOK)
+
+		set_gradient(now, curr_item.start, curr_item.end, cINPROGRESS, cOK)
 	}
 
-	if (next_item != null) {
-		let until_hrt = next_item.start - now;
-		let hours = Math.floor(until_hrt)
-		let minutes = Math.round(60 * (until_hrt - hours))
-		msg += `\nyour next item is in ${hours? `${hours} hours and `:''}${minutes} minutes at ${next_item.loc}`
+	if (next_item) {
+		const until = next_item.start - now;
 
-		if (curr_item == null) {
-			if (until_hrt < 0.25)
-				set_gradient (now, next_item.start - 0.25, next_item.start, cWARNING, cINPROGRESS)
-			else if (until_hrt < 0.5)
-				set_gradient (now, next_item.start - 0.5, next_item.start - 0.25, cOK, cWARNING)
+		const hours   = Math.floor(until)
+		const minutes = Math.round(until % 1 * 60)
+
+		msg += `\nyour next item is in ${ hours ? `${hours} hours and `: ''}${minutes} minutes at ${next_item.loc}`
+
+		if (!curr_item) {
+			if (until < 0.25)
+				set_gradient(now, next_item.start - 0.25, next_item.start, cWARNING, cINPROGRESS)
+			else if (until < 0.5)
+				set_gradient(now, next_item.start - 0.5, next_item.start - 0.25, cOK, cWARNING)
 			else
 				BURRITO.style.backgroundColor = '#' + cOK
 		}
@@ -82,26 +88,22 @@ function update()
 
 function set_gradient(now, start, end, starthex, endhex)
 {
-	let total = end - start
-	let remaining = end - now
+	const total     = end - start
+	const remaining = end - now
+
 	BURRITO.style.backgroundColor = '#' + get_gradient(1 - remaining/total, starthex, endhex)
 }
 
 function get_gradient(percent, start_hex, end_hex)
 {
-	let startvals = get_three_hex(start_hex)
-	let endvals = get_three_hex(end_hex)
+	const [startvals, endvals] = [start_hex, end_hex]
+		.map(str => str.match(/../g).map(part => parseInt(part, 16)))
 
-	let gradient = '';
-
-	for (i in startvals)
-		gradient += Math.round((startvals[i] + percent * (endvals[i] - startvals[i]))).toString(16)
-
-	return gradient
+	return startvals
+		.map((start, i) => start + percent * (endvals[i] - start))
+		.map(num => Math.round(num).toString(16))
+		.join('')
 }
-
-function get_three_hex(hexstr) { return hexstr.split(/(?=(?:..)*$)/).map(num => parseInt('0x' + num)) }
-function pad (myint) { return myint.toString().padStart(2, '0') }
 
 const KEY = 'schedule_clock'
 
@@ -120,7 +122,7 @@ const src_url = new URLSearchParams(window.location.search).get('src')
 	if (src_url)
 		window.localStorage.setItem(KEY, JSON.stringify(schedule))
 
-	createClock(schedule)
+	create_clock(schedule)
 
 })();
 </script>
