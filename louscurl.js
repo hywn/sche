@@ -6,17 +6,13 @@
  * returns an array of objects that, as described in schedule.js,
  * represent all meeting times of the given classes
 */
-function promiseSchedule(classCodes)
+async function promiseSchedule(classCodes)
 {
-	return new Promise(resolve => {
-		if (!classCodes || classCodes.length == 0) {
-			resolve('')
-			return
-		}
+	if (!classCodes || classCodes.length == 0)
+		return ''
 
-		Promise.all(classCodes.map(code => promiseClass(code)))
-			.then(talss => resolve(talss.flat().filter(tal => tal)))
-	})
+	return Promise.all(classCodes.map(promiseClass))
+		.then(talss => talss.flat().filter(tal => tal))
 }
 
 /* takes a UVA class code (e.g. 12345)
@@ -24,34 +20,32 @@ function promiseSchedule(classCodes)
  * returns an array of objects that, as described in schedule.js,
  * represent the meeting times of the given class
 */
-function promiseClass(classCode)
+async function promiseClass(classCode)
 {
-	return new Promise(resolve =>
-		scurl("https://louslist.org/sectiontip.php?ClassNumber=" + classCode).then(text => {
-			const title = text.match(/(class="InfoClass">)(.*)(<br)/)[2]
-			const tals = Array.from(text.matchAll(/(?<=\/td><td>)(.*?)(?:<\/td><td>)(.*?)(?=<\/td><\/tr>)/g)).map(groups => {
+	return scurl("https://louslist.org/sectiontip.php?ClassNumber=" + classCode).then(text => {
 
-				let timedow  = groups[1].toLowerCase()
-				let location = groups[2]
+		const title = text.match(/(class="InfoClass">)(.*)(<br)/)[2]
 
-				let times = timedow.match(/\d+:\d+(?:am|pm)/g)
+		return Array.from(text.matchAll(/(?<=\/td><td>)(.*?)(?:<\/td><td>)(.*?)(?=<\/td><\/tr>)/g)).map(groups => {
 
-				if (!times)
-					return null
+			let timedow  = groups[1].toLowerCase()
+			let location = groups[2]
 
-				return {
-					title: title,
-					loc:   location,
-					dows:  timedow.match(/mo|tu|we|th|fr|sa|su/g).map(name => days.indexOf(name)),
-					start: toHRT(times[0]),
-					end:   toHRT(times[1])
-				}
+			let times = timedow.match(/\d+:\d+(?:am|pm)/g)
 
-			})
+			if (!times)
+				return null
 
-			resolve(tals)
+			return {
+				title: title,
+				loc:   location,
+				dows:  timedow.match(/mo|tu|we|th|fr|sa|su/g).map(name => days.indexOf(name)),
+				start: toHRT(times[0]),
+				end:   toHRT(times[1])
+			}
+
 		})
-	)
+	})
 }
 
 /* takes a 12-hour time string
@@ -70,11 +64,8 @@ function toHRT(text)
 /* takes a url and a function
  * runs the function with the url's response text
 */
-function scurl(url)
+async function scurl(url)
 {
-	return new Promise(resolve =>
-		fetch('https://simplecorsworkaround.herokuapp.com/?url=' + encodeURIComponent(url))
-			.then(resp => resp.text())
-			.then(text => resolve(text))
-	)
+	return fetch('https://simplecorsworkaround.herokuapp.com/?url=' + encodeURIComponent(url))
+		.then(resp => resp.text())
 }
