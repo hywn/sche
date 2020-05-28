@@ -2,9 +2,10 @@
 <script src="schedule.js"></script>
 <script src="canvasschedule.js"></script>
 
-<div id="scheduleBox" class="box"><div id="sbInner"><canvas id="schedule"></div></div>
-
-<div id="geninfo" class="box">
+<div class="box">
+	<canvas id="schedule">
+</div>
+<div class="box">
 	<textarea id="editor" placeholder="editor window"></textarea>
 	<textarea id="output" placeholder="output window"></textarea>
 </div>
@@ -12,21 +13,23 @@
 <style>
 body {
 	display: flex;
+	flex-direction: row-reverse;
 	flex-wrap: wrap;
 	justify-content: center;
-	align-items: center;
-	flex-direction: row-reverse
+	align-items: center
 }
 
-.box { background-color: #eee; padding: 1em; margin: 1em }
+.box {
+	margin: 1em;
+	padding: 1em;
+	background-color: #eee;
 
-#sbInner { background-color: #fff; padding: 1em }
-#scheduleBox { display: inline-block }
+	display: flex;
+	flex-direction: column
+}
 
-#geninfo { width:400px }
-textarea { width: 100%; resize: none }
-#editor { height: 24em }
-#output { height: 12em }
+textarea { width: 32em; height: 32em; white-space: nowrap }
+#output  { height: 12em }
 </style>
 
 <script>
