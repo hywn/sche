@@ -115,8 +115,10 @@ const src_url = new URLSearchParams(window.location.search).get('src')
 		                .then(r => r.text())
 		                .then(text => text.replace(/#.*/g, '').replace(/^!.+/mg, ''))
 		                .then(stripped => parseSchedule(stripped))
-		                .finally(json => window.localStorage.setItem(KEY, JSON.stringify(json)))
 		        : JSON.parse(window.localStorage.getItem(KEY) || '[]')
+
+	if (src_url)
+		window.localStorage.setItem(KEY, JSON.stringify(schedule))
 
 	createClock(schedule)
 
