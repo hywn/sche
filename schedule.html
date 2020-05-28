@@ -1,29 +1,25 @@
 <script src="schedule.js"></script>
 <script src="canvasschedule.js"></script>
 
-<div id="scheduleBox" class="box">
-	<div id="sbInner">
-		<canvas id="scheduleCanvas">
-	</div>
+<div class="box">
+	<canvas id="schedule">
 </div>
-
-<div id="geninfo" class="box">
+<div class="box">
 	<textarea id="editor"></textarea>
 </div>
 
 <style>
-body { display: flex;
-       flex-wrap: wrap;
-       justify-content: center;
-       align-items: center;
-       flex-direction: row-reverse }
+body {
+	display: flex;
+	flex-direction: row-reverse;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center
+}
 
-.box { background-color: #eee; padding: 1em; margin: 1em }
+.box { margin: 1em; padding: 1em; background-color: #eee }
 
-#scheduleBox { display: inline-block }
-
-#geninfo { width:400px }
-#editor { width: 100%; height: 36em; white-space: nowrap }
+#editor { width: 32em; height: 32em; white-space: nowrap }
 </style>
 
 <script>
@@ -87,9 +83,7 @@ function gen()
 					: groups[2]
 		})
 
-	s = new ScheduleCanvas('scheduleCanvas', settings)
-
-	document.querySelector("#sbInner").style.backgroundColor = s.background
+	s = new ScheduleCanvas('schedule', settings)
 
 	// note: temporary workaround?
 	s.drawSchedule(EDITOR.value.replace(/#.*/g, '').replace(/^!.+/mg, '').trim())
