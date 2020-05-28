@@ -21,16 +21,15 @@ const cINPROGRESS = 'f5364f'
 
 let today_items = []
 
-function createClock (schedule)
+function createClock(schedule)
 {
 	const curr_dow = new Date().getDay()
-
-	console.log(schedule)
 
 	today_items = schedule
 		.filter(item => item.dows.includes(curr_dow))
 		.sort((a, b) => a.start - b.end)
 
+	update()
 	setInterval(update, 1000)
 }
 
@@ -104,14 +103,22 @@ function get_gradient(percent, start_hex, end_hex)
 function get_three_hex(hexstr) { return hexstr.split(/(?=(?:..)*$)/).map(num => parseInt('0x' + num)) }
 function pad (myint) { return myint.toString().padStart(2, '0') }
 
-const url = new URL(window.location.href);
-const schedurl = url.searchParams.get('src');
-if (schedurl) // sets ui values from text
-	fetch(schedurl)
-		.then(response => response.text())
-		.then(text => createClock(parseSchedule(text
-			.replace(/#.*/g, '')
-			.replace(/^!.+/mg, '')
-			.trim()
-		)))
+const KEY = 'schedule_clock'
+
+// loads schedule data from 1. URL or 2. local storage
+const src_url = new URLSearchParams(window.location.search).get('src')
+
+;(async function() {
+
+	const schedule =
+		src_url ? await fetch(src_url)
+		                .then(r => r.text())
+		                .then(text => text.replace(/#.*/g, '').replace(/^!.+/mg, ''))
+		                .then(stripped => parseSchedule(stripped))
+		                .finally(json => window.localStorage.setItem(KEY, JSON.stringify(json)))
+		        : JSON.parse(window.localStorage.getItem(KEY) || '[]')
+
+	createClock(schedule)
+
+})();
 </script>
