@@ -26,25 +26,25 @@ async function promiseClass(classCode)
 
 		const title = text.match(/(class="InfoClass">)(.*)(<br)/)[2]
 
-		return Array.from(text.matchAll(/(?<=\/td><td>)(.*?)(?:<\/td><td>)(.*?)(?=<\/td><\/tr>)/g)).map(groups => {
+		return [...text.matchAll(/(?<=\/td><td>)(.*?)(?:<\/td><td>)(.*?)(?=<\/td><\/tr>)/g)].map(([, timedow, loc]) => {
 
-			let timedow  = groups[1].toLowerCase()
-			let location = groups[2]
-
-			let times = timedow.match(/\d+:\d+(?:am|pm)/g)
+			const times = timedow.match(/\d+:\d+(?:am|pm)/ig)
 
 			if (!times)
 				return null
 
 			return {
 				title: title,
-				loc:   location,
-				dows:  timedow.match(/mo|tu|we|th|fr|sa|su/g).map(name => days.indexOf(name)),
+				loc:   loc,
+				dows:  timedow.match(/mo|we|fr|tu|th|sa|su/ig)
+					.map(dow => dow.toLowerCase())
+					.map(dow => days.indexOf(dow)),
 				start: toHRT(times[0]),
 				end:   toHRT(times[1])
 			}
 
 		})
+
 	})
 }
 
@@ -55,10 +55,10 @@ async function promiseClass(classCode)
 */
 function toHRT(text)
 {
-	const nums = text.match(/\d+/g).map(n => Number(n))
-	const ampm = text.toLowerCase().match(/am|pm/g)[0] === 'pm' ? 12 : 0
+	const [hours, mins] = text.match(/\d+/g).map(n => Number(n))
+	const ampm          = text.match(/pm/ig) ? 12 : 0
 
-	return (ampm + nums[0] % 12) + nums[1] / 60
+	return (ampm + hours % 12) + mins / 60
 }
 
 /* takes a url and a function
