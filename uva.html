@@ -35,23 +35,7 @@ const OUTPUT = document.querySelector('#output')
 
 const KEY = 'uva_schedule'
 const SCHEDULE_DISPLAY = new ScheduleCanvas('schedule', {background: '#fff'})
-
-/// gets past work in local storage
-function load()
-{
-	const loaded = window.localStorage.getItem(KEY)
-	return loaded? loaded : '# enter class codes separated by whitespace\n# use #s for comments\n# press ctrl+s to save/draw schedule\n\n12345 # some class\n23456 # some other class\n\n# other classes:\n34567 45678 56789'
-}
-
-/// editor keylistener (saves work in local storage)
-EDITOR.addEventListener('keydown', e => {
-	if (!(e.ctrlKey && e.key === 's')) return
-
-	window.localStorage.setItem(KEY, EDITOR.value)
-	gen()
-
-	e.preventDefault()
-})
+const TUTORIAL = '# enter class codes separated by whitespace\n# use #s for comments\n# press ctrl+s to save/draw schedule\n\n12345 # some class\n23456 # some other class\n\n# other classes:\n34567 45678 56789'
 
 /// displays canvas schedule; outputs output
 function gen()
@@ -68,17 +52,26 @@ function gen()
 	})
 }
 
-// loads schedule data from 1. URL or 2. local storage
-const srcurl = new URL(window.location.href).searchParams.get("src")
-if (srcurl) {
-	fetch(srcurl)
-		.then(resp => resp.text())
-		.then(text => {
-			EDITOR.value = text
-			gen()
-		})
-} else {
-	EDITOR.value = load()
+/// editor keylistener (saves work in local storage)
+EDITOR.addEventListener('keydown', e => {
+	if (!(e.ctrlKey && e.key === 's')) return
+
+	window.localStorage.setItem(KEY, EDITOR.value)
 	gen()
-}
+
+	e.preventDefault()
+})
+
+// loads schedule data from 1. URL or 2. local storage
+const src_url = new URLSearchParams(window.location.search).get('src')
+
+;(async function() {
+
+	EDITOR.value =
+		src_url ? await fetch(src_url).then(r => r.text())
+		        : window.localStorage.getItem(KEY) || TUTORIAL
+
+	gen()
+
+})();
 </script>

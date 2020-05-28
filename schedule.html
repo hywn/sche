@@ -105,24 +105,16 @@ EDITOR.addEventListener('keydown', e => {
 	e.preventDefault()
 })
 
-/// gets past work in local storage
-function load()
-{
-	const loaded = window.localStorage.getItem(KEY)
-	return loaded? loaded : TUTORIAL
-}
-
 // loads schedule data from 1. URL or 2. local storage
-const srcurl = new URL(window.location.href).searchParams.get("src")
-if (srcurl) {
-	fetch(srcurl)
-		.then(resp => resp.text())
-		.then(text => {
-			EDITOR.value = text
-			gen()
-		})
-} else {
-	EDITOR.value = load()
+const src_url = new URLSearchParams(window.location.search).get('src')
+
+;(async function() {
+
+	EDITOR.value =
+		src_url ? await fetch(src_url).then(r => r.text())
+		        : window.localStorage.getItem(KEY) || TUTORIAL
+
 	gen()
-}
+
+})();
 </script>
