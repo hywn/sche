@@ -47,7 +47,7 @@ fr
 # use #s for comments
 # use !s to set settings like so:
 
-!background #fof
+!background #f0f
 !font 14px Comic Sans MS
 
 # you only need to set those you wish to override.
@@ -63,7 +63,7 @@ function get_default_settings_text()
 {
 	const spacing = Math.max(...Object.keys(default_settings).map(key => key.length))
 	return Object.entries(default_settings)
-		.map(entry => `!${(entry[0]).padEnd(spacing)} ${entry[1]}`)
+		.map(([key, val]) => `!${key.padEnd(spacing)} ${val}`)
 		.join('\n')
 }
 
@@ -75,15 +75,15 @@ function gen()
 	const settings = {...default_settings}
 
 	Array.from(EDITOR.value.matchAll(/!(\w+)\s+(.+)/g))
-		.filter(groups => groups[1] in settings)
-		.forEach(groups => {
-			settings[groups[1]] =
-				typeof settings[groups[1]] === 'number'?
-					Number(groups[2])
-					: groups[2]
+		.forEach(([, key, val]) => {
+			if (!(key in settings))
+				return
+
+			settings[key] = typeof settings[key] === 'number' ? Number(val)
+			                                                  : val
 		})
 
-	s = new ScheduleCanvas('schedule', settings)
+	const s = new ScheduleCanvas('schedule', settings)
 
 	// note: temporary workaround?
 	s.drawSchedule(EDITOR.value.replace(/#.*/g, '').replace(/^!.+/mg, '').trim())
