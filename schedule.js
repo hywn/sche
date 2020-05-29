@@ -70,7 +70,7 @@ function parseChunk(chunkText)
 
 function parseHours(string)
 {
-	let [hours, mins=0] = string.match(/\d+/g).map(num => Number(num))
+	let [hours, mins=0] = string.match(/\d{1,2}/g).map(num => Number(num))
 
 	if (string.match(/am|pm/i))
 		hours %= 12
