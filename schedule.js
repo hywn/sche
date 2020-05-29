@@ -1,17 +1,17 @@
 /*
 
-item object:
+-- example of single item --
 
-[{
-	title: 'My Item Title'
+mowefr
+8:30-10 Calculus at Olsson 009
+
+{
+	title: 'Calculus'
 	loc: 'Olsson 009',
 	start: 8.5,
 	end: 10,
 	dows: [1, 3, 5]
-}, ...]
-
-mowefr
-8:30-10 Calculus at Olsson 009
+}
 
 */
 
@@ -47,52 +47,54 @@ function parseSchedule(text)
  */
 function parseChunk(chunkText)
 {
-	const lines = chunkText.split('\n')
+	const [header, ...lines] = chunkText.split('\n')
 
 	// temporary fix?
-	if (!lines[0].match(/(mo|we|fr|tu|th|sa|su)+/gi))
+	if (!header.match(/(mo|we|fr|tu|th|sa|su)+/ig))
 		return null
 
-	const dows = lines[0].toLowerCase()
+	const dows = header.toLowerCase()
 		.match(/mo|we|fr|tu|th|sa|su/g)
 		.map(dow => days.indexOf(dow))
 
-	return lines.slice(1).map(line => {
-
-		const groups = line.match(/(.+?)-(.+?)\s+(.+?)(?= at (.+)|$)/i)
-
-		return {
-			start: parseHours(groups[1]),
-			end:   parseHours(groups[2]),
-			title: groups[3],
-			loc:   groups[4]? groups[4] : 'unknown',
-			dows:  dows
-		}
-	})
+	return lines
+		.map(line => line.match(/(.+?)-(.+?)\s+(.+?)(?= at (.+)|$)/))
+		.map(([, start, end, title, loc]) => ({
+			title: title,
+			dows:  dows,
+			loc:   loc || 'unknown',
+			start: parseHours(start),
+			end:   parseHours(end)
+		}))
 }
 
 function parseHours(string)
 {
-	const groups = string.toLowerCase().match(/(\d{1,2}):?(\d{0,2})?(am|pm)?/)
-	const hours  = parseFloat(groups[1])
-	const mins   = groups[2]? parseFloat(groups[2]) : 0
-	const ampm   = groups[3]
+	let [hours, mins=0] = string.match(/\d+/g).map(num => Number(num))
 
-	return mins/60 + (ampm? hours % 12 : hours) + (ampm? (ampm === 'pm'? 12 : 0) : 0)
+	if (string.match(/am|pm/i))
+		hours %= 12
+
+	if (string.match(/pm/i))
+		hours += 12
+
+	return hours + mins / 60
 }
 
 function getTextSchedule(schedule)
 {
-	console.log(schedule)
-	let append = ''
-	for (tal of schedule)
-		append += `${tal.dows.map(i => days[i]).join('')}\n${to24Hour(tal.start)}-${to24Hour(tal.end)} ${tal.title} at ${tal.loc}\n\n`
-	return append
+	return schedule
+		.map(({title, dows, loc, start, end}) =>
+			`${dows.map(i => days[i]).join('')}\n${[start, end].map(to24Hour).join('-')} ${title} at ${loc}`)
+		.join('\n\n')
 }
 
 function to24Hour(hrt)
 {
-	let hours = Math.floor(hrt)
-	let minutes = Math.round(60 * (hrt - hours))
-	return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+	const hours = Math.floor(hrt)
+	const mins  = Math.round(hrt % 1 * 60)
+
+	return [hours, mins]
+		.map(num => num.toString().padStart(2, '0'))
+		.join(':')
 }
