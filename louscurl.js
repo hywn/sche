@@ -24,11 +24,11 @@ async function promiseClass(classCode)
 {
 	const text = await scurl("https://louslist.org/sectiontip.php?ClassNumber=" + classCode)
 
-	const title = text.match(/(class="InfoClass">)(.*)(<br)/)[2]
+	const [, title] = text.match(/class="InfoClass">(.*)<br/)
 
-	return [...text.matchAll(/(?<=\/td><td>)(.*?)(?:<\/td><td>)(.*?)(?=<\/td><\/tr>)/g)].map(([, timedow, loc]) => {
+	return [...text.matchAll(/<\/td><td>(.*?)<\/td><td>(.*?)<\/td><\/tr>/g)].map(([, timedow, loc]) => {
 
-		const times = timedow.match(/\d+:\d+(?:am|pm)/ig)
+		const times = timedow.match(/\d+:\d+(am|pm)/ig)
 
 		if (!times)
 			return null
@@ -36,8 +36,8 @@ async function promiseClass(classCode)
 		return {
 			title: title,
 			loc:   loc,
-			dows:  timedow.match(/mo|we|fr|tu|th|sa|su/ig)
-				.map(dow => dow.toLowerCase())
+			dows:  timedow.toLowerCase()
+				.match(/mo|we|fr|tu|th|sa|su/g)
 				.map(dow => days.indexOf(dow)),
 			start: toHRT(times[0]),
 			end:   toHRT(times[1])
