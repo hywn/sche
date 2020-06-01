@@ -42,6 +42,9 @@ class ScheduleCanvas
 		can.width = this.marginX + this.padding*2 + this.longDays.length*this.blockWidth
 		can.height = this.marginY + this.padding*2 + (this.endHour - this.startHour + 1) * this.blockHeight
 
+		this.canvas.parentElement.style.width  = can.width
+		this.canvas.parentElement.style.height = can.height
+
 		c.globalAlpha = 1
 		c.font = this.font
 		c.strokeStyle = this.foreground
