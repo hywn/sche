@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="schedule.css" />
 <script src="schedule.js"></script>
 <script src="canvasschedule.js"></script>
 
@@ -5,22 +6,8 @@
 	<canvas id="schedule">
 </div>
 <div class="box">
-	<textarea id="editor"></textarea>
+	<pre id="editor" contenteditable="true"></pre>
 </div>
-
-<style>
-body {
-	display: flex;
-	flex-direction: row-reverse;
-	flex-wrap: wrap;
-	justify-content: center;
-	align-items: center
-}
-
-.box { margin: 1em; padding: 1em; background-color: #eee }
-
-#editor { width: 32em; height: 32em; white-space: nowrap }
-</style>
 
 <script>
 const EDITOR = document.querySelector('#editor')
@@ -70,11 +57,11 @@ function get_default_settings_text()
 /// generates schedule
 function gen()
 {
-	EDITOR.value = EDITOR.value.replace(/^!default$/mg, get_default_settings_text())
+	EDITOR.innerText = EDITOR.innerText.replace(/^!default$/mg, get_default_settings_text())
 
 	const settings = {...default_settings}
 
-	Array.from(EDITOR.value.matchAll(/!(\w+)\s+(.+)/g))
+	Array.from(EDITOR.innerText.matchAll(/!(\w+)\s+(.+)/g))
 		.forEach(([, key, val]) => {
 			if (!(key in settings))
 				return
@@ -86,14 +73,14 @@ function gen()
 	const s = new ScheduleCanvas('schedule', settings)
 
 	// note: temporary workaround?
-	s.drawSchedule(EDITOR.value.replace(/#.*/g, '').replace(/^!.+/mg, '').trim())
+	s.drawSchedule(EDITOR.innerText.replace(/#.*/g, '').replace(/^!.+/mg, '').trim())
 }
 
 /// editor keylistener (saves work in local storage)
 EDITOR.addEventListener('keydown', e => {
 	if (!(e.ctrlKey && e.key === 's')) return
 
-	window.localStorage.setItem(KEY, EDITOR.value)
+	window.localStorage.setItem(KEY, EDITOR.innerText)
 	gen()
 
 	e.preventDefault()
@@ -104,7 +91,7 @@ const src_url = new URLSearchParams(window.location.search).get('src')
 
 ;(async function() {
 
-	EDITOR.value =
+	EDITOR.innerText =
 		src_url ? await fetch(src_url).then(r => r.text())
 		        : window.localStorage.getItem(KEY) || TUTORIAL
 

@@ -1,0 +1,33 @@
+body {
+	margin: 5em;
+
+	display: flex;
+	flex-direction: row-reverse;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center
+}
+
+pre {
+	margin: 0;
+	padding: 1em;
+
+	white-space: nowrap;
+	overflow: scroll;
+	resize: both;
+
+	background-color: #fff
+}
+
+.box {
+	margin: 1em;
+	padding: 1em;
+
+	display: flex;
+	flex-direction: column;
+
+	background-color: #eee
+}
+
+#editor { width: 32em; height: 32em }
+#output {              height: 10em }
