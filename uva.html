@@ -8,7 +8,7 @@
 </div>
 <div class="box">
 	<pre id="editor" contenteditable="true"></pre>
-	<pre id="output" contenteditable="true"></pre>
+	<textarea id="output" placeholder="output window"></textarea>
 </div>
 
 <script>
@@ -26,11 +26,11 @@ function gen()
 		.replace(/#.*/g, '') // remove comments
 		.match(/\d+/g)       // extract codes
 
-	OUTPUT.innerText = 'loading...'
+	OUTPUT.value = 'loading...'
 
 	promiseSchedule(classes).then(sched => {
 		SCHEDULE_DISPLAY.drawScheduleCallback(sched)
-		OUTPUT.innerText = getTextSchedule(sched)
+		OUTPUT.value = getTextSchedule(sched)
 	})
 }
 

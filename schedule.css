@@ -30,4 +30,4 @@ pre {
 }
 
 #editor { width: 32em; height: 32em }
-#output {              height: 10em }
+#output {              height: 10em; white-space: pre }
