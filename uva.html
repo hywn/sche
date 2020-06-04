@@ -7,7 +7,7 @@
 	<canvas id="schedule">
 </div>
 <div class="box">
-	<pre id="editor" contenteditable="true"></pre>
+	<textarea id="editor" placeholder="input window"></textarea>
 	<textarea id="output" placeholder="output window"></textarea>
 </div>
 
@@ -22,7 +22,7 @@ const TUTORIAL = '# enter class codes separated by whitespace\n# use #s for comm
 /// displays canvas schedule; outputs output
 function gen()
 {
-	const classes = EDITOR.innerText
+	const classes = EDITOR.value
 		.replace(/#.*/g, '') // remove comments
 		.match(/\d+/g)       // extract codes
 
@@ -38,7 +38,7 @@ function gen()
 EDITOR.addEventListener('keydown', e => {
 	if (!(e.ctrlKey && e.key === 's')) return
 
-	window.localStorage.setItem(KEY, EDITOR.innerText)
+	window.localStorage.setItem(KEY, EDITOR.value)
 	gen()
 
 	e.preventDefault()
@@ -49,7 +49,7 @@ const src_url = new URLSearchParams(window.location.search).get('src')
 
 ;(async function() {
 
-	EDITOR.innerText =
+	EDITOR.value =
 		src_url ? await fetch(src_url).then(r => r.text())
 		        : window.localStorage.getItem(KEY) || TUTORIAL
 

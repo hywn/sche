@@ -8,11 +8,11 @@ body {
 	align-items: center
 }
 
-pre {
+textarea {
 	margin: 0;
 	padding: 1em;
 
-	white-space: nowrap;
+	white-space: pre;
 	overflow: scroll;
 	resize: both;
 
@@ -30,4 +30,4 @@ pre {
 }
 
 #editor { width: 32em; height: 32em }
-#output {              height: 10em; white-space: pre }
+#output {              height: 10em }
