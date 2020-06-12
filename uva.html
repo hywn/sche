@@ -29,7 +29,7 @@ function gen()
 	OUTPUT.value = 'loading...'
 
 	promiseSchedule(classes).then(sched => {
-		SCHEDULE_DISPLAY.drawScheduleCallback(sched)
+		SCHEDULE_DISPLAY.drawSchedule(sched)
 		OUTPUT.value = getTextSchedule(sched)
 	})
 }
