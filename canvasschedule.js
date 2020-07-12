@@ -149,10 +149,7 @@ const draw_text =
 const wrapped =
 	c => max_width => text =>
 {
-	const words = text.match(/\S+/g)
-
-	if (!words)
-		return ''
+	const words = text.match(/\S+/g) || []
 
 	return words.reduce((lines, word) => {
 

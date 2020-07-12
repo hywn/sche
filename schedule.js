@@ -59,6 +59,7 @@ function parseChunk(chunkText)
 
 	return lines
 		.map(line => line.match(/(.+?)-(.+?)\s+(.+?)(?= at (.+)|$)/))
+		.filter(x => x)
 		.map(([, start, end, title, loc]) => ({
 			title: title,
 			dows:  dows,
