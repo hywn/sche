@@ -41,9 +41,8 @@ const new_canvasschedule =
 	c.textAlign    = 'center'
 	c.textBaseline = 'middle'
 
-	s.canvas = can
-	s.c      = c
-
+	s.canvas        = can
+	s.c             = c
 	s.draw_text     = draw_text(s)
 	s.draw_textrect = draw_textrect(s)
 	s.draw_outline  = draw_outline(s)
@@ -74,11 +73,10 @@ const draw_schedule =
 const draw_outline =
 	({
 		draw_textrect,
-		longDays,
-		startHour, endHour,
-		background, guideOpacity,
-		padding, marginX, marginY,
+		marginX, marginY, padding,
 		blockHeight, blockWidth,
+		background, guideOpacity,
+		longDays, startHour, endHour,
 		c, canvas: { width, height }
 	}) => () =>
 {
@@ -87,13 +85,11 @@ const draw_outline =
 
 	// draw lines
 	c.globalAlpha = guideOpacity
-	for (let hour = startHour + 1; hour <= endHour; ++hour)
-		c.strokeRect(
-			padding + marginX,
-			padding + marginY + (hour - startHour) * blockHeight,
-			width - marginY - padding * 2,
-			0
-		)
+	for (let i = 1; i <= (endHour - startHour); ++i)
+		draw_textrect
+			(0, i * blockHeight)
+			(width - marginY - padding * 2, 0)
+			('')
 	c.globalAlpha = 1
 
 	// draw DOWs
@@ -114,25 +110,22 @@ const draw_outline =
 const draw_textrect =
 	({
 		draw_text,
-		background, foreground, textground,
-		padding, textPadding,
-		marginX, marginY,
+		marginX, marginY, padding, textPadding,
+		background, textground,
 		c
 	}) => (x, y) => (width, height) => text =>
 {
 	x += padding + marginX
 	y += padding + marginY
 
-	c.strokeStyle = foreground
-	c.fillStyle   = background
+	c.fillStyle = background
 	c.fillRect(x, y, width, height)
 	c.strokeRect(x, y, width, height)
 
-	c.fillStyle = textground;
-
+	c.fillStyle = textground
 	draw_text
-		(x + width/2, y + height/2)
-		(wrapped(c)(width - textPadding*2)(text))
+		(x + width / 2, y + height / 2)
+		(wrapped(c)(width - textPadding * 2)(text))
 }
 
 const draw_text =
