@@ -57,7 +57,7 @@ const draw_schedule =
 	({
 		draw_outline,
 		draw_textrect,
-		marginX, marginY, padding, blockWidth, blockHeight,
+		marginX, marginY, blockWidth, blockHeight,
 		startHour,
 		dowOffset
 	}) => schedule =>
@@ -68,7 +68,7 @@ const draw_schedule =
 	for (const item of schedule)
 		for (const dow of item.dows)
 			draw_textrect
-				(padding + marginX + (dow - dowOffset) * blockWidth, padding + marginY + (item.start - startHour) * blockHeight)
+				(marginX + (dow - dowOffset) * blockWidth, marginY + (item.start - startHour) * blockHeight)
 				(blockWidth, (item.end - item.start) * blockHeight)
 				(item.title)
 }
@@ -101,14 +101,14 @@ const draw_outline =
 	// draw DOWs
 	for (let day = 0; day < longDays.length; ++day)
 		draw_textrect
-			(padding + marginX + blockWidth * day, padding)
+			(marginX + blockWidth * day, 0)
 			(blockWidth, marginY)
 			(longDays[day])
 
 	// draw times
 	for (let hour = startHour; hour <= endHour; ++hour)
 		draw_textrect
-			(padding, padding + marginY + (hour - startHour) * blockHeight)
+			(0, marginY + (hour - startHour) * blockHeight)
 			(marginX, blockHeight)
 			(hour.toString())
 }
@@ -117,10 +117,13 @@ const draw_textrect =
 	({
 		draw_text,
 		background, foreground, textground,
-		textPadding,
+		padding, textPadding,
 		c
 	}) => (x, y) => (width, height) => text =>
 {
+	x += padding
+	y += padding
+
 	c.strokeStyle = foreground
 	c.fillStyle   = background
 	c.fillRect(x, y, width, height)
