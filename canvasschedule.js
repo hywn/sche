@@ -55,22 +55,20 @@ const new_canvasschedule =
 
 const draw_schedule =
 	({
-		draw_outline,
-		draw_textrect,
-		marginX, marginY, blockWidth, blockHeight,
-		startHour,
-		dowOffset
+		draw_outline, draw_textrect,
+		blockWidth, blockHeight,
+		startHour, dowOffset
 	}) => schedule =>
 {
 	draw_outline()
 
 	// draw items
-	for (const item of schedule)
-		for (const dow of item.dows)
+	for (const { dows, start, end, title } of schedule)
+		for (const dow of dows)
 			draw_textrect
-				(marginX + (dow - dowOffset) * blockWidth, marginY + (item.start - startHour) * blockHeight)
-				(blockWidth, (item.end - item.start) * blockHeight)
-				(item.title)
+				((dow - dowOffset) * blockWidth, (start - startHour) * blockHeight)
+				(blockWidth, (end - start) * blockHeight)
+				(title)
 }
 
 const draw_outline =
@@ -101,14 +99,14 @@ const draw_outline =
 	// draw DOWs
 	for (let day = 0; day < longDays.length; ++day)
 		draw_textrect
-			(marginX + blockWidth * day, 0)
+			(blockWidth * day, -marginY)
 			(blockWidth, marginY)
 			(longDays[day])
 
 	// draw times
 	for (let hour = startHour; hour <= endHour; ++hour)
 		draw_textrect
-			(0, marginY + (hour - startHour) * blockHeight)
+			(-marginX, (hour - startHour) * blockHeight)
 			(marginX, blockHeight)
 			(hour.toString())
 }
@@ -118,11 +116,12 @@ const draw_textrect =
 		draw_text,
 		background, foreground, textground,
 		padding, textPadding,
+		marginX, marginY,
 		c
 	}) => (x, y) => (width, height) => text =>
 {
-	x += padding
-	y += padding
+	x += padding + marginX
+	y += padding + marginY
 
 	c.strokeStyle = foreground
 	c.fillStyle   = background
@@ -157,14 +156,12 @@ const wrapped =
 
 	return words.reduce((lines, word) => {
 
-		const appended = `${lines[lines.length - 1]} ${word}`
+		const old   = lines.pop()
+		const nieuw = `${old} ${word}`
 
-		if (c.measureText(appended).width <= max_width)
-			lines[lines.length - 1] = appended
-		else
-			lines.push(word)
-
-		return lines
+		return c.measureText(nieuw).width <= max_width
+			? [...lines, nieuw]
+			: [...lines, old, word]
 
 	}, [words.shift()]).join('\n')
 }
