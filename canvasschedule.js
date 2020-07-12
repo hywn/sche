@@ -18,141 +18,150 @@ const default_settings = {
 	dowOffset: 1
 }
 
-class ScheduleCanvas
+const new_canvasschedule =
+	(canvas_selector, new_settings={}) =>
 {
-	constructor(canvasID, new_settings={})
-	{
-		const settings = {...default_settings}
+	const s = {...default_settings, ...new_settings}
 
-		Object.entries(new_settings)
-			.forEach(([k, v]) => settings[k] = v)
+	s.longDays  = s.longDays.split(',')
+	s.shortDays = s.shortDays.split(',')
 
-		Object.entries(settings)
-			.forEach(([k, v]) => this[k] = v)
+	const can = document.querySelector(canvas_selector)
+	const c   = can.getContext('2d')
 
-		this.longDays  = this.longDays.split(',')
-		this.shortDays = this.shortDays.split(',')
+	can.width  = s.padding*2 + s.marginX + s.longDays.length * s.blockWidth
+	can.height = s.padding*2 + s.marginY + (s.endHour - s.startHour + 1) * s.blockHeight
 
-		const can = this.canvas = document.getElementById(canvasID)
-		const c   = this.c      = can.getContext('2d')
+	can.parentElement.style.width  = can.width
+	can.parentElement.style.height = can.height
 
-		can.width  = this.padding*2 + this.marginX + this.longDays.length * this.blockWidth
-		can.height = this.padding*2 + this.marginY + (this.endHour - this.startHour + 1) * this.blockHeight
+	c.globalAlpha  = 1
+	c.font         = s.font
+	c.strokeStyle  = s.foreground
+	c.textAlign    = 'center'
+	c.textBaseline = 'middle'
 
-		can.parentElement.style.width  = can.width
-		can.parentElement.style.height = can.height
+	s.canvas = can
+	s.c      = c
 
-		c.globalAlpha  = 1
-		c.font         = this.font
-		c.strokeStyle  = this.foreground
-		c.textAlign    = 'center'
-		c.textBaseline = 'middle'
+	s.draw_text     = draw_text(s)
+	s.draw_textrect = draw_textrect(s)
+	s.draw_outline  = draw_outline(s)
 
-		this.drawSchedule([])
-	}
+	s.draw_outline()
 
-	drawSchedule(schedule)
-	{
-		const {
-			marginX, marginY, padding, blockWidth, blockHeight,
-			startHour, endHour,
-			c
-		} = this
+	return draw_schedule(s)
+}
 
-		c.fillStyle = this.background
-		c.fillRect(0, 0, this.canvas.width, this.canvas.height)
+const draw_schedule =
+	({
+		draw_outline,
+		draw_textrect,
+		marginX, marginY, padding, blockWidth, blockHeight,
+		startHour,
+		dowOffset
+	}) => schedule =>
+{
+	draw_outline()
 
-		// draw lines
-		c.globalAlpha = this.guideOpacity
-		for (let hour = startHour + 1; hour <= endHour; ++hour)
-			c.strokeRect(
-				padding + marginX,
-				padding + marginY + (hour - startHour) * blockHeight,
-				this.canvas.width - marginY - padding * 2,
-				0
-			)
-		c.globalAlpha = 1
+	// draw items
+	for (const item of schedule)
+		for (const dow of item.dows)
+			draw_textrect
+				(padding + marginX + (dow - dowOffset) * blockWidth, padding + marginY + (item.start - startHour) * blockHeight)
+				(blockWidth, (item.end - item.start) * blockHeight)
+				(item.title)
+}
 
-		// draw DOWs
-		for (let day = 0; day < this.longDays.length; ++day)
-			this.drawTextRect(
-				this.longDays[day],
-				padding + marginX + blockWidth * day,
-				padding,
-				blockWidth,
-				marginY
-			)
+const draw_outline =
+	({
+		draw_textrect,
+		longDays,
+		startHour, endHour,
+		background, guideOpacity,
+		padding, marginX, marginY,
+		blockHeight, blockWidth,
+		c, canvas: { width, height }
+	}) => () =>
+{
+	c.fillStyle = background
+	c.fillRect(0, 0, width, height)
 
-		// draw times
-		for (let hour = startHour; hour <= endHour; ++hour)
-			this.drawTextRect(
-				hour.toString(),
-				padding,
-				padding + marginY + (hour - startHour) * blockHeight,
-				marginX,
-				blockHeight
-			)
-
-		// draw items
-		for (const item of schedule)
-			for (const dow of item.dows)
-				this.drawTextRect(
-					item.title,
-					padding + marginX + (dow - this.dowOffset) * blockWidth,
-					padding + marginY + (item.start - startHour) * blockHeight,
-					blockWidth,
-					(item.end - item.start) * blockHeight
-				)
-	}
-
-	drawTextRect(text, x, y, width, height)
-	{
-		const { c, background, foreground, textground } = this
-
-		c.strokeStyle = foreground
-		c.fillStyle   = background
-		c.fillRect(x, y, width, height)
-		c.strokeRect(x, y, width, height)
-
-		c.fillStyle = textground;
-
-		this.drawText(
-			this.wrapped(text, width - this.textPadding*2),
-			x + width/2,
-			y + height/2
+	// draw lines
+	c.globalAlpha = guideOpacity
+	for (let hour = startHour + 1; hour <= endHour; ++hour)
+		c.strokeRect(
+			padding + marginX,
+			padding + marginY + (hour - startHour) * blockHeight,
+			width - marginY - padding * 2,
+			0
 		)
-	}
+	c.globalAlpha = 1
 
-	drawText(text, centerX, centerY)
-	{
-		const { lineHeight: lh } = this
+	// draw DOWs
+	for (let day = 0; day < longDays.length; ++day)
+		draw_textrect
+			(padding + marginX + blockWidth * day, padding)
+			(blockWidth, marginY)
+			(longDays[day])
 
-		const lines = text.split('\n')
+	// draw times
+	for (let hour = startHour; hour <= endHour; ++hour)
+		draw_textrect
+			(padding, padding + marginY + (hour - startHour) * blockHeight)
+			(marginX, blockHeight)
+			(hour.toString())
+}
 
-		const topY = centerY + lh * (1 - lines.length) / 2
+const draw_textrect =
+	({
+		draw_text,
+		background, foreground, textground,
+		textPadding,
+		c
+	}) => (x, y) => (width, height) => text =>
+{
+	c.strokeStyle = foreground
+	c.fillStyle   = background
+	c.fillRect(x, y, width, height)
+	c.strokeRect(x, y, width, height)
 
-		for (let i = 0; i < lines.length; ++i)
-			this.c.fillText(lines[i], centerX, topY + lh * i)
-	}
+	c.fillStyle = textground;
 
-	wrapped(text, max_width)
-	{
-		const words = text.match(/\S+/g)
+	draw_text
+		(x + width/2, y + height/2)
+		(wrapped(c)(width - textPadding*2)(text))
+}
 
-		if (!words)
-			return ''
+const draw_text =
+	({ c, lineHeight: lh }) => (centerX, centerY) => text =>
+{
+	const lines = text.split('\n')
 
-		return words.reduce((lines, word) => {
+	const topY = centerY + lh * (1 - lines.length) / 2
 
-			const appended = `${lines[lines.length - 1]} ${word}`
+	for (let i = 0; i < lines.length; ++i)
+		c.fillText(lines[i], centerX, topY + lh * i)
+}
 
-			if (this.c.measureText(appended).width <= max_width)
-				lines[lines.length - 1] = appended
-			else
-				lines.push(word)
+const wrapped =
+	c => max_width => text =>
+{
+	const words = text.match(/\S+/g)
 
-			return lines
+	if (!words)
+		return ''
 
-		}, [words.shift()]).join('\n')
-	}
+	return words.reduce((lines, word) => {
+
+		const appended = `${lines[lines.length - 1]} ${word}`
+
+		if (c.measureText(appended).width <= max_width)
+			lines[lines.length - 1] = appended
+		else
+			lines.push(word)
+
+		return lines
+
+	}, [words.shift()]).join('\n')
 }

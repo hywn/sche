@@ -16,7 +16,7 @@ const EDITOR = document.querySelector('#editor')
 const OUTPUT = document.querySelector('#output')
 
 const KEY = 'uva_schedule'
-const SCHEDULE_DISPLAY = new ScheduleCanvas('schedule', {background: '#fff'})
+const SCHEDULE_DISPLAY = new_canvasschedule('#schedule', {background: '#fff'})
 const TUTORIAL = '# enter class codes separated by whitespace\n# use #s for comments\n# press ctrl+s to save/draw schedule\n\n12345 # some class\n23456 # some other class\n\n# other classes:\n34567 45678 56789'
 
 /// displays canvas schedule; outputs output
@@ -29,7 +29,7 @@ function gen()
 	OUTPUT.value = 'loading...'
 
 	promiseSchedule(classes).then(sched => {
-		SCHEDULE_DISPLAY.drawSchedule(sched)
+		SCHEDULE_DISPLAY(sched)
 		OUTPUT.value = getTextSchedule(sched)
 	})
 }

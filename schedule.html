@@ -70,10 +70,10 @@ function gen()
 			                                                  : val
 		})
 
-	const s = new ScheduleCanvas('schedule', settings)
-
 	// note: temporary workaround?
-	s.drawSchedule(parseSchedule(EDITOR.value.replace(/#.*/g, '').replace(/^!.+/mg, '').trim()))
+	new_canvasschedule
+		('#schedule', settings)
+		(parseSchedule(EDITOR.value.replace(/#.*/g, '').replace(/^!.+/mg, '').trim()))
 }
 
 /// editor keylistener (saves work in local storage)
