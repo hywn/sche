@@ -82,12 +82,22 @@ function parseHours(string)
 	return hours + mins / 60
 }
 
+// weird and uses a bunch of string sorting
 function getTextSchedule(schedule)
 {
-	return schedule
-		.map(({title, dows, loc, start, end}) =>
-			`${dows.map(i => days[i]).join('')}\n${[start, end].map(to24Hour).join('-')} ${title} at ${loc}`)
-		.join('\n\n')
+	return Object.entries(
+		schedule.reduce((hash, {title, dows, loc, start, end}) => {
+			const key = dows.join('')
+
+			if (!hash[key]) hash[key] = []
+
+			hash[key].push(`${[start, end].map(to24Hour).join('-')} ${title} at ${loc}`)
+
+			return hash
+		}, {})
+	).sort()
+	 .map(([k, v]) => `${k.split('').map(x => days[parseInt(x)]).join('')}\n${v.sort().join('\n')}`)
+	 .join('\n\n')
 }
 
 function to24Hour(hrt)
