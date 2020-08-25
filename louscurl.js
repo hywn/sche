@@ -6,7 +6,7 @@
  * returns an array of objects that, as described in schedule.js,
  * represent all meeting times of the given classes
 */
-async function promiseSchedule(classCodes)
+function promiseSchedule(classCodes)
 {
 	if (!classCodes || classCodes.length == 0)
 		return []
