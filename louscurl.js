@@ -9,7 +9,7 @@
 async function promiseSchedule(classCodes)
 {
 	if (!classCodes || classCodes.length == 0)
-		return ''
+		return []
 
 	return Promise.all(classCodes.map(promiseClass))
 		.then(talss => talss.flat().filter(tal => tal))
