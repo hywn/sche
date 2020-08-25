@@ -19,6 +19,8 @@ schedule.html -- display schedule
 uva.html      -- display UVA schedule
 clock.html    -- display schedule clock
 
+schedule.css -- stylesheet for schedule.html and uva.html
+
 canvasschedule.js -- turn schedule data into canvas display
 schedule.js       -- turn text into schedule data (and vice-versa)
 louscurl.js       -- turn UVA class codes into schedule data
