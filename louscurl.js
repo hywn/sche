@@ -64,6 +64,6 @@ function toHRT(text)
 */
 async function scurl(url)
 {
-	return fetch('https://simplecorsworkaround.herokuapp.com/?url=' + encodeURIComponent(url))
+	return fetch('https://www.cs.virginia.edu/~jh7qbe/test.php?url=' + encodeURIComponent(url))
 		.then(resp => resp.text())
 }
