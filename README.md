@@ -10,7 +10,7 @@ sche is 3 tools:
 
 schedule and uva are both imo pretty complete 'type some stuff, press ctrl+s, and see visual change'-type app?s, and I hope the included tutorials explain how to use them.
 
-clock is kinda weird, and I haven't worked it out very well.
+clock is kinda weird; I haven't worked it out very well.
 
 ## files
 ```
@@ -27,5 +27,5 @@ louscurl.js       -- turn UVA class codes into schedule data
 ```
 
 ## notes
-- sche is entirely in vanilla HTML+JS and can run from your filesystem in most modern browsers (have tested in Chrome + Firefox)
+- sche is entirely vanilla HTML+JS and can run from your filesystem in most modern browsers (have tested in Chrome + Firefox)
 - uva/louscurl.js gets its data from [louslist.org](https://louslist.org/) via a CORS workaround currently hosted on my personal school account
