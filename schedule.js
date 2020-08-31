@@ -30,7 +30,7 @@ const days = ['su', 'mo', 'tu', 'we', 'th', 'fr', 'sa']
  */
 function parseSchedule(text)
 {
-	return text.split('\n\n')
+	return text.split(/\n\n+/)
 		.filter(chunk => chunk)
 		.flatMap(chunk => parseChunk(chunk))
 		.filter(parsed => parsed)
