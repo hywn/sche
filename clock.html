@@ -8,9 +8,9 @@ body { display: flex; justify-content: center; align-items: center; font-size: 2
 #burrito { width: 12em; padding: 2em }
 </style>
 
-<script src="schedule.js"></script>
+<script type=module>
+import { parseSchedule } from './schedule.js'
 
-<script>
 const TIME    = document.querySelector('#time')
 const MESSAGE = document.querySelector('#message')
 const BURRITO = document.querySelector('#burrito')

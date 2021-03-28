@@ -155,3 +155,5 @@ const wrapped =
 
 	}, [words.shift()]).join('\n')
 }
+
+export { new_canvasschedule, default_settings }

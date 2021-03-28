@@ -1,5 +1,4 @@
-/// note: uses the following from schedule.js
-/// const days = ['su', 'mo', 'tu', 'we', 'th', 'fr', 'sa']
+const days = ['su', 'mo', 'tu', 'we', 'th', 'fr', 'sa']
 
 /* takes an array of UVA class codes
  *
@@ -67,3 +66,5 @@ async function scurl(url)
 	return fetch('https://www.cs.virginia.edu/~jh7qbe/test.php?url=' + encodeURIComponent(url))
 		.then(resp => resp.text())
 }
+
+export { promiseSchedule }

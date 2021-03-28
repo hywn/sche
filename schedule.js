@@ -109,3 +109,5 @@ function to24Hour(hrt)
 		.map(num => num.toString().padStart(2, '0'))
 		.join(':')
 }
+
+export { parseSchedule, getTextSchedule }

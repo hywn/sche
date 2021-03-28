@@ -1,6 +1,4 @@
 <link rel="stylesheet" href="schedule.css" />
-<script src="schedule.js"></script>
-<script src="canvasschedule.js"></script>
 
 <div class="box">
 	<canvas id="schedule">
@@ -9,7 +7,10 @@
 	<textarea id="editor" placeholder="editor window"></textarea>
 </div>
 
-<script>
+<script type=module>
+import { new_canvasschedule, default_settings } from './canvasschedule.js'
+import { parseSchedule } from './schedule.js'
+
 const EDITOR = document.querySelector('#editor')
 const KEY    = 'regular_schedule'
 const TUTORIAL = `# enter your schedule in the following format:

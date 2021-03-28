@@ -1,7 +1,4 @@
 <link rel="stylesheet" href="schedule.css" />
-<script src="louscurl.js"></script>
-<script src="schedule.js"></script>
-<script src="canvasschedule.js"></script>
 
 <div class="box">
 	<canvas id="schedule">
@@ -11,7 +8,11 @@
 	<textarea id="output" placeholder="output window"></textarea>
 </div>
 
-<script>
+<script type=module>
+import { getTextSchedule } from './schedule.js'
+import { promiseSchedule } from './louscurl.js'
+import { new_canvasschedule } from './canvasschedule.js'
+
 const EDITOR = document.querySelector('#editor')
 const OUTPUT = document.querySelector('#output')
 

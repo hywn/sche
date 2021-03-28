@@ -25,7 +25,3 @@ canvasschedule.js -- turn schedule data into canvas display
 schedule.js       -- turn text into schedule data (and vice-versa)
 louscurl.js       -- turn UVA class codes into schedule data
 ```
-
-## notes
-- sche is entirely vanilla HTML+JS and can run from your filesystem in most modern browsers (have tested in Chrome + Firefox)
-- uva/louscurl.js gets its data from [louslist.org](https://louslist.org/) via a CORS workaround currently hosted on my personal school account
