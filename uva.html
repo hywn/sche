@@ -21,7 +21,7 @@ const SCHEDULE_DISPLAY = new_canvasschedule('#schedule', {background: '#fff'})
 const TUTORIAL = '# enter class codes separated by whitespace\n# use #s for comments\n# press ctrl+s to save/draw schedule\n\n12345 # some class\n23456 # some other class\n\n# other classes:\n34567 45678 56789'
 
 /// displays canvas schedule; outputs output
-async function gen()
+async function gen(outputURL) // outputURL: spits out url instead of text schedule
 {
 	const classes = EDITOR.value
 		.replace(/#.*/g, '') // remove comments
@@ -32,27 +32,31 @@ async function gen()
 	const sched = await promiseSchedule(classes)
 
 	SCHEDULE_DISPLAY(sched)
-	OUTPUT.value = getTextSchedule(sched)
+
+	OUTPUT.value = outputURL
+		? `${window.location.origin}${window.location.pathname}?codes=${classes.join('+')}`
+		: getTextSchedule(sched)
 }
 
 /// editor keylistener (saves work in local storage)
 EDITOR.addEventListener('keydown', e => {
-	if (!(e.ctrlKey && e.key === 's')) return
+	if (!(e.ctrlKey && e.key.toLowerCase() === 's')) return
 
 	window.localStorage.setItem(KEY, EDITOR.value)
-	gen()
+	gen(e.shiftKey)
 
 	e.preventDefault()
 })
 
-// loads schedule data from 1. URL or 2. local storage
+// loads schedule data from 1. URL or 2. codes or 3. local storage
 const src_url = new URLSearchParams(window.location.search).get('src')
+const codes   = new URLSearchParams(window.location.search).get('codes')
 
 ;(async function() {
 
-	EDITOR.value =
-		src_url ? await fetch(src_url).then(r => r.text())
-		        : window.localStorage.getItem(KEY) || TUTORIAL
+	EDITOR.value = src_url
+		? await fetch(src_url).then(r => r.text())
+		: codes || window.localStorage.getItem(KEY) || TUTORIAL
 
 	gen()
 
